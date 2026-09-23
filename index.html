@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#24194f">
+  <meta name="description" content="Read, respond, and download your completed music assignment.">
+  <title>Vivaldi and The Four Seasons · Derby Music</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2324194f'/%3E%3Cpath d='M37 12v31a9 9 0 1 1-5-8V18l20-5v22a9 9 0 1 1-5-8V8z' fill='%23ffd956'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="assignment.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="pixel-sky" aria-hidden="true"></div>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">♫</span><span>DERBY <b>MUSIC</b></span></div>
+      <div class="top-actions"><span id="themeLabel" class="theme-label"></span><button id="themeButton" class="small-button" type="button" title="Change theme">CHANGE THEME <span aria-hidden="true">↻</span></button></div>
+    </header>
+    <main id="assignmentView">
+      <div class="heading"><div class="kicker" id="eyebrow"></div><h1 id="title"></h1><p class="subhead">Read the story, answer three questions, and save your work for Google Classroom.</p></div>
+      <div class="progress-wrap"><span id="stepLabel"></span><div class="segments" id="segments" aria-label="Assignment progress"></div><span id="stepCounter"></span></div>
+      <section class="card" id="stage" aria-live="polite"></section>
+      <nav class="navigation" aria-label="Assignment pages"><button id="backButton" type="button" class="nav-button secondary">← BACK</button><span class="nav-hint" id="navHint"></span><button id="nextButton" type="button" class="nav-button primary">NEXT →</button></nav>
+      <p id="status" class="status" role="status"></p>
+    </main>
+    <section id="builderView" class="builder" hidden>
+      <div class="heading"><div class="kicker">TEACHER BUILDER</div><h1>Make an assignment</h1><p class="subhead">Edit the content below, preview it, then copy its student link into Classroom. The link contains the assignment; no student answers are sent anywhere.</p></div>
+      <div class="builder-card"><label for="editor">Assignment content (JSON)</label><textarea id="editor" spellcheck="false"></textarea><p class="builder-help">Keep three reading paragraphs, one multiple-choice question with options, and two short-answer questions. For new images, use a direct HTTPS image URL and include credit and source.</p><div class="builder-actions"><button id="previewButton" class="nav-button primary" type="button">PREVIEW ASSIGNMENT</button><button id="copyButton" class="nav-button secondary" type="button">COPY STUDENT LINK</button></div><p id="builderStatus" class="status" role="status"></p></div>
+    </section>
+    <footer><span>DERBY MUSIC · YOUR WORK STAYS IN THIS BROWSER UNTIL YOU DOWNLOAD IT</span><a id="teacherLink" href="?builder=1">TEACHER BUILDER</a></footer>
+  </div>
+</body>
+</html>
