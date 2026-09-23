@@ -34,11 +34,11 @@
     $('themeLabel').textContent = themeNames[themeIndex];
   }
   function storeDraft() {
-    try { sessionStorage.setItem('music-draft:' + location.hash, JSON.stringify(responses)); } catch {}
+    try { sessionStorage.setItem('music-draft:' + location.search + location.hash, JSON.stringify(responses)); } catch {}
   }
   function loadDraft() {
     try {
-      const value = JSON.parse(sessionStorage.getItem('music-draft:' + location.hash));
+      const value = JSON.parse(sessionStorage.getItem('music-draft:' + location.search + location.hash));
       if (value && typeof value.name === 'string' && Array.isArray(value.short)) responses = value;
     } catch {}
   }
@@ -73,7 +73,7 @@
     if (step === 4) renderFinish(stage);
   }
   function renderReading(stage) {
-    setHeading(stage, 'THE STORY · 3 SHORT PARAGRAPHS', 'Can music paint a picture?');
+    setHeading(stage, 'THE STORY · 3 SHORT PARAGRAPHS', assignment.readingHeading || 'Can music paint a picture?');
     const layout = node('div', null, 'reading-layout');
     const copy = node('div', null, 'reading-copy');
     assignment.reading.forEach(p => copy.append(node('p', p)));
