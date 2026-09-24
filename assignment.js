@@ -53,6 +53,34 @@ window.ASSIGNMENTS = {
       "What part of Gillespie's music or career made him a good musical ambassador? Use one detail from the reading.",
       "If you were at the Cairo concert, what would you listen for to hear musicians responding to one another?"
     ]
+  },
+
+  "music-in-venice": {
+    title: "Music in Venice, Italy",
+    eyebrow: "MUSIC CLASS · READING 03",
+    readingHeading: "Why did Venice become such a musical city?",
+    image: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Piazza%20San%20Marco%2C%20St%20Mark%27s%20Square%2C%20Venice%2C%20Italy.jpg",
+    imageAlt: "Piazza San Marco, St. Mark's Square, in Venice, Italy",
+    imageCredit: "Vyacheslav Argenberg, 2006 · via Wikimedia Commons",
+    imageSource: "https://commons.wikimedia.org/wiki/File:Piazza_San_Marco,_St_Mark%27s_Square,_Venice,_Italy.jpg",
+    reading: [
+      "Venice is a city built around islands, canals, bridges, churches, and public squares. For hundreds of years, music has been part of the city's public life. People heard music in churches, theaters, celebrations, and special events. Venice also became important to the spread of written music. In 1501, the Venetian printer Ottaviano Petrucci published an important collection of music using movable type, helping printed music reach more musicians.",
+      "During the 1600s and 1700s, Venice became one of Europe's great centers for opera and instrumental music. The first public opera house in Venice opened in 1637, which meant opera was no longer only entertainment for royal courts and wealthy families. Venice was also the home of Antonio Vivaldi, the famous violinist and composer. Vivaldi worked for many years at the Ospedale della Pietà, where girls received serious musical training and performed concerts that attracted visitors.",
+      "Music is still part of the way many people imagine Venice today. A visitor might hear church bells, orchestras and singers in theaters, small ensembles in public squares, or musicians performing music by Vivaldi. Venice shows how a place can shape its musical traditions. Its churches, theaters, schools, audiences, and festivals all helped make music an important part of the city's identity."
+    ],
+    multipleChoice: {
+      question: "Which statement best explains why Venice became important in music history?",
+      options: [
+        "It supported music through churches, theaters, schools, printing, and public performances",
+        "It was the only city in Europe where people were allowed to play violins",
+        "All Venetian music was written for gondolas",
+        "Venice avoided opera and focused only on church music"
+      ]
+    },
+    shortAnswers: [
+      "Name two places or situations in Venice where people could hear music, based on the reading.",
+      "How can a city help a musical tradition grow? Use one example from Venice in your answer."
+    ]
   }
 };
 
