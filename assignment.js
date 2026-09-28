@@ -81,6 +81,34 @@ window.ASSIGNMENTS = {
       "Name two places or situations in Venice where people could hear music, based on the reading.",
       "How can a city help a musical tradition grow? Use one example from Venice in your answer."
     ]
+  },
+
+  "muppets-take-manhattan": {
+    title: "The Muppets Take Manhattan: Music and Storytelling",
+    eyebrow: "MUSIC CLASS · READING 04",
+    readingHeading: "What jobs can music do in a movie?",
+    image: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Palace%20Theatre%20%28New%20York%20City%29%20%2854076031977%29.jpg",
+    imageAlt: "The Palace Theatre in the Broadway theater district of Manhattan",
+    imageCredit: "Ajay Suresh, 2024 · CC BY 2.0, via Wikimedia Commons",
+    imageSource: "https://commons.wikimedia.org/wiki/File:Palace_Theatre_(New_York_City)_(54076031977).jpg",
+    reading: [
+      "The Muppets Take Manhattan is a 1984 musical comedy about Kermit and his friends trying to bring their stage show, Manhattan Melodies, to Broadway. Because the story is about performers putting on a musical, songs are not simply decoration. Music helps introduce the group, show how the characters feel, and mark important changes in the story.",
+      "Early in the movie, the ensemble song “Together Again” presents the Muppets as a team. Later, “Saying Goodbye” appears when the group separates, and its slower, more emotional character helps the audience feel that change. These songs show one of the basic ideas of a movie musical: music can communicate an emotion or an idea more quickly than a long explanation.",
+      "Near the end of the film, the music grows into larger ensemble numbers as the characters finally reach the Broadway stage. Voices, instruments, movement, comedy, costumes, and acting all work together. The songs were written by Jeff Moss, while Ralph Burns created the instrumental score. In a movie like this, music can create mood, reveal character, move the plot forward, and turn a story event into a performance."
+    ],
+    multipleChoice: {
+      question: "According to the reading, what is one important job of music in The Muppets Take Manhattan?",
+      options: [
+        "It helps communicate emotions and move the story forward",
+        "It replaces every spoken scene in the movie",
+        "It teaches the audience how to read music",
+        "It is used only during the ending credits"
+      ]
+    },
+    shortAnswers: [
+      "Choose one musical moment described in the reading. What feeling or idea does the music help communicate?",
+      "Imagine one of the movie's musical scenes without any music. How do you think the scene would feel different?"
+    ]
   }
 };
 
