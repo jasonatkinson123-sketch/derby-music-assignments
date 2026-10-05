@@ -53,6 +53,11 @@ jobs:
             'const assignmentKey = new URLSearchParams(location.search).get("a") || "vivaldi-four-seasons";\n' +
             'window.DEFAULT_ASSIGNMENT = window.ASSIGNMENTS[assignmentKey] || window.ASSIGNMENTS["vivaldi-four-seasons"];\n';
           fs.writeFileSync('assignment.js', js);
+
+          const index = fs.readFileSync('index.html', 'utf8');
+          const version = Date.now().toString();
+          const refreshed = index.replace(/assignment\.js\?v=[^"]+/g, 'assignment.js?v=' + version);
+          fs.writeFileSync('index.html', refreshed);
           fs.writeFileSync('.published-slug', slug);
           NODE
 
@@ -60,7 +65,7 @@ jobs:
         run: |
           git config user.name "Derby Assignment Publisher"
           git config user.email "actions@users.noreply.github.com"
-          git add assignments.json assignment.js
+          git add assignments.json assignment.js index.html
           if git diff --cached --quiet; then
             echo "No assignment changes to commit."
           else
