@@ -1,0 +1,90 @@
+name: Publish Music Assignment
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    if: github.event.issue.user.login == 'jasonatkinson123-sketch' && startsWith(github.event.issue.title, '[Publish Assignment]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out assignment site
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate and publish assignment
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+
+          const body = process.env.ISSUE_BODY || '';
+          const payloadLine = body.split(/\r?\n/).find(line => line.startsWith('DERBY_ASSIGNMENT_BASE64:'));
+          const slugLine = body.split(/\r?\n/).find(line => line.startsWith('DERBY_ASSIGNMENT_SLUG:'));
+          if (!payloadLine || !slugLine) throw new Error('Publish request is missing its assignment payload.');
+
+          const slug = slugLine.slice('DERBY_ASSIGNMENT_SLUG:'.length).trim();
+          if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 80) throw new Error('Invalid assignment slug.');
+
+          const encoded = payloadLine.slice('DERBY_ASSIGNMENT_BASE64:'.length).trim();
+          const assignment = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8'));
+
+          const valid = a =>
+            a && typeof a.title === 'string' && a.title.trim() &&
+            Array.isArray(a.reading) && a.reading.length === 3 && a.reading.every(x => typeof x === 'string' && x.trim()) &&
+            a.multipleChoice && typeof a.multipleChoice.question === 'string' && a.multipleChoice.question.trim() &&
+            Array.isArray(a.multipleChoice.options) && a.multipleChoice.options.length >= 2 && a.multipleChoice.options.every(x => typeof x === 'string' && x.trim()) &&
+            Array.isArray(a.shortAnswers) && a.shortAnswers.length === 2 && a.shortAnswers.every(x => typeof x === 'string' && x.trim());
+
+          if (!valid(assignment)) throw new Error('Assignment does not match the Derby Music format.');
+
+          const data = JSON.parse(fs.readFileSync('assignments.json', 'utf8'));
+          data[slug] = assignment;
+          fs.writeFileSync('assignments.json', JSON.stringify(data, null, 2) + '\n');
+
+          const js = 'window.ASSIGNMENTS = ' + JSON.stringify(data, null, 2) + ';\n\n' +
+            'const assignmentKey = new URLSearchParams(location.search).get("a") || "vivaldi-four-seasons";\n' +
+            'window.DEFAULT_ASSIGNMENT = window.ASSIGNMENTS[assignmentKey] || window.ASSIGNMENTS["vivaldi-four-seasons"];\n';
+          fs.writeFileSync('assignment.js', js);
+          fs.writeFileSync('.published-slug', slug);
+          NODE
+
+      - name: Commit published assignment
+        run: |
+          git config user.name "Derby Assignment Publisher"
+          git config user.email "actions@users.noreply.github.com"
+          git add assignments.json assignment.js
+          if git diff --cached --quiet; then
+            echo "No assignment changes to commit."
+          else
+            git commit -m "Publish assignment: $(cat .published-slug)"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Confirm and close publish request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const slug = fs.readFileSync('.published-slug', 'utf8').trim();
+            const url = `https://jasonatkinson123-sketch.github.io/derby-music-assignments/?a=${slug}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Published: ${url}\n\nIt will appear in the Assignment Library after the Pages deployment completes.`
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
