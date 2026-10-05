@@ -47,8 +47,8 @@
     if (!validAssignment(assignment)) assignment = window.DEFAULT_ASSIGNMENT;
     responses = { name: '', choice: null, short: ['', ''] };
     loadDraft(); step = 0;
-    $('assignmentView').hidden = false; $('builderView').hidden = true;
-    $('teacherLink').hidden = false;
+    $('assignmentView').hidden = false; $('builderView').hidden = true; $('libraryView').hidden = true;
+    $('teacherLink').hidden = false; $('libraryLink').hidden = false;
     document.title = assignment.title + ' · Derby Music';
     $('title').textContent = assignment.title;
     $('eyebrow').textContent = assignment.eyebrow || 'MUSIC CLASS · READING';
@@ -187,10 +187,94 @@
     if (!validAssignment(a)) throw new Error('Use three reading paragraphs, at least two multiple-choice options, and two short-answer questions.');
     return a;
   }
+  const LIBRARY_KEY = 'derby-music-assignment-library-v1';
   function studentLink(a) { return location.origin + location.pathname + '#assignment=' + encodeURIComponent(JSON.stringify(a)); }
+  function builtInLink(key) { return location.origin + location.pathname + '?a=' + encodeURIComponent(key); }
+  function loadLibrary() {
+    try {
+      const value = JSON.parse(localStorage.getItem(LIBRARY_KEY) || '[]');
+      return Array.isArray(value) ? value.filter(x => x && x.assignment && validAssignment(x.assignment)) : [];
+    } catch { return []; }
+  }
+  function writeLibrary(items) {
+    localStorage.setItem(LIBRARY_KEY, JSON.stringify(items));
+  }
+  function slugify(value) {
+    return String(value || 'assignment').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'assignment';
+  }
+  function saveToLibrary(a) {
+    const items = loadLibrary();
+    const title = a.title.trim();
+    const existing = items.find(x => String(x.title || '').toLowerCase() === title.toLowerCase());
+    if (existing) {
+      existing.assignment = a;
+      existing.title = title;
+      existing.updatedAt = Date.now();
+      writeLibrary(items);
+      return existing;
+    }
+    let id = slugify(title);
+    if (items.some(x => x.id === id)) id += '-' + Date.now().toString(36);
+    const entry = { id, title, assignment: a, updatedAt: Date.now() };
+    items.unshift(entry);
+    writeLibrary(items);
+    return entry;
+  }
+  async function copyText(value, statusEl) {
+    try {
+      await navigator.clipboard.writeText(value);
+      if (statusEl) statusEl.textContent = 'Student link copied. Paste it into Google Classroom.';
+    } catch {
+      if (statusEl) statusEl.textContent = 'Could not copy automatically. Open the assignment and copy the address from the browser.';
+    }
+  }
+  function libraryCard(title, meta, link, editLink, customId) {
+    const card = node('article', null, 'library-card');
+    card.append(node('div', meta, 'library-meta'), node('h2', title));
+    const actions = node('div', null, 'library-actions');
+    const open = node('a', 'OPEN'); open.className = 'library-button primary'; open.href = link; open.target = '_blank'; open.rel = 'noopener';
+    const copy = node('button', 'COPY LINK'); copy.className = 'library-button'; copy.type = 'button';
+    copy.addEventListener('click', () => copyText(link, $('libraryStatus')));
+    const edit = node('a', 'EDIT'); edit.className = 'library-button'; edit.href = editLink;
+    actions.append(open, copy, edit);
+    if (customId) {
+      const del = node('button', 'DELETE'); del.className = 'library-button danger'; del.type = 'button';
+      del.addEventListener('click', () => {
+        const next = loadLibrary().filter(x => x.id !== customId);
+        writeLibrary(next);
+        $('libraryStatus').textContent = 'Removed from your saved library.';
+        renderLibrary();
+      });
+      actions.append(del);
+    }
+    card.append(actions);
+    return card;
+  }
+  function renderLibrary() {
+    const list = $('libraryList');
+    list.replaceChildren();
+    Object.entries(window.ASSIGNMENTS || {}).forEach(([key, a]) => {
+      list.append(libraryCard(a.title, 'PERMANENT ASSIGNMENT', builtInLink(key), '?builder=1&a=' + encodeURIComponent(key), null));
+    });
+    const saved = loadLibrary();
+    saved.forEach(entry => {
+      const link = studentLink(entry.assignment);
+      list.append(libraryCard(entry.title, 'SAVED IN THIS BROWSER', link, '?builder=1' + link.slice(link.indexOf('#')), entry.id));
+    });
+    $('libraryEmpty').hidden = list.children.length > 0;
+  }
+  function showLibrary() {
+    $('assignmentView').hidden = true; $('builderView').hidden = true; $('libraryView').hidden = false;
+    $('teacherLink').hidden = false; $('libraryLink').hidden = true;
+    $('libraryStatus').textContent = '';
+    document.title = 'Assignment Library · Derby Music';
+    renderLibrary();
+  }
   function showBuilder() {
-    $('assignmentView').hidden = true; $('builderView').hidden = false; $('teacherLink').hidden = true;
+    $('assignmentView').hidden = true; $('builderView').hidden = false; $('libraryView').hidden = true;
+    $('teacherLink').hidden = true; $('libraryLink').hidden = false;
     $('editor').value = JSON.stringify(parseAssignment(), null, 2);
+    $('builderStatus').textContent = '';
     document.title = 'Teacher Builder · Derby Music';
   }
   $('backButton').addEventListener('click', () => { if (step > 0) { step--; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); } });
@@ -201,10 +285,25 @@
     catch (e) { $('builderStatus').textContent = e.message; }
   });
   $('copyButton').addEventListener('click', async () => {
-    try { const link = studentLink(readEditor()); await navigator.clipboard.writeText(link); $('builderStatus').textContent = 'Student link copied. Paste it into Google Classroom.'; }
+    try { await copyText(studentLink(readEditor()), $('builderStatus')); }
     catch (e) { $('builderStatus').textContent = e instanceof SyntaxError ? 'Check the JSON formatting and try again.' : (e.message || 'Could not copy. Try previewing the assignment and copying the address.'); }
   });
-  window.addEventListener('hashchange', () => { if (!$('builderView').hidden) return; showAssignment(); });
+  $('saveButton').addEventListener('click', () => {
+    try {
+      const a = readEditor();
+      saveToLibrary(a);
+      $('builderStatus').textContent = 'Saved to Assignment Library. Its student link is ready to post.';
+    } catch (e) {
+      $('builderStatus').textContent = e instanceof SyntaxError ? 'Check the JSON formatting and try again.' : (e.message || 'Could not save this assignment.');
+    }
+  });
+  window.addEventListener('hashchange', () => {
+    if (!$('builderView').hidden || !$('libraryView').hidden) return;
+    showAssignment();
+  });
   setTheme();
-  if (new URLSearchParams(location.search).has('builder')) showBuilder(); else showAssignment();
+  const params = new URLSearchParams(location.search);
+  if (params.has('library')) showLibrary();
+  else if (params.has('builder')) showBuilder();
+  else showAssignment();
 })();
