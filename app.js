@@ -271,6 +271,11 @@
     copy.addEventListener('click', () => copyText(link, $('libraryStatus')));
     const edit = node('a', 'EDIT'); edit.className = 'library-button'; edit.href = editLink;
     actions.append(open, copy, edit);
+    if (!customId && assignmentData) {
+      const duplicate = node('a', 'DUPLICATE'); duplicate.className = 'library-button';
+      duplicate.href = '?builder=1' + studentLink(assignmentData).slice(studentLink(assignmentData).indexOf('#'));
+      actions.append(duplicate);
+    }
     if (customId && assignmentData) {
       const publish = node('button', 'PUBLISH'); publish.className = 'library-button primary'; publish.type = 'button';
       publish.addEventListener('click', () => openPublishRequest(assignmentData, $('libraryStatus')));
@@ -337,10 +342,40 @@
     document.title = 'Assignment Library · Derby Music';
     renderLibrary();
   }
+  function newAssignmentTemplate() {
+    return {
+      title: 'New Music Assignment',
+      eyebrow: 'MUSIC CLASS · READING',
+      readingHeading: 'What will we learn from this music?',
+      image: '',
+      imageAlt: '',
+      imageCredit: '',
+      imageSource: '',
+      reading: [
+        'Write the first short reading paragraph here.',
+        'Write the second short reading paragraph here.',
+        'Write the third short reading paragraph here.'
+      ],
+      multipleChoice: {
+        question: 'Write one multiple-choice question here.',
+        options: ['Correct answer', 'Choice two', 'Choice three', 'Choice four']
+      },
+      shortAnswers: [
+        'Write the first short-answer question here.',
+        'Write the second short-answer question here.'
+      ]
+    };
+  }
+  function builderAssignment() {
+    if (location.hash.startsWith('#assignment=')) return parseAssignment();
+    const key = new URLSearchParams(location.search).get('a');
+    if (key && window.ASSIGNMENTS && window.ASSIGNMENTS[key]) return window.ASSIGNMENTS[key];
+    return newAssignmentTemplate();
+  }
   function showBuilder() {
     $('assignmentView').hidden = true; $('builderView').hidden = false; $('libraryView').hidden = true;
     $('teacherLink').hidden = true; $('libraryLink').hidden = false;
-    $('editor').value = JSON.stringify(parseAssignment(), null, 2);
+    $('editor').value = JSON.stringify(builderAssignment(), null, 2);
     $('builderStatus').textContent = '';
     document.title = 'Teacher Builder · Derby Music';
   }
