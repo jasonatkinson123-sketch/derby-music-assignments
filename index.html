@@ -8,8 +8,8 @@
   <title>Vivaldi and The Four Seasons · Derby Music</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2324194f'/%3E%3Cpath d='M37 12v31a9 9 0 1 1-5-8V18l20-5v22a9 9 0 1 1-5-8V8z' fill='%23ffd956'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css?v=20261005-2">
-  <script src="assignment.js?v=20261005-1" defer></script>
-  <script src="app.js?v=20261005-2" defer></script>
+  <script src="assignment.js?v=20261005-3" defer></script>
+  <script src="app.js?v=20261005-3" defer></script>
 </head>
 <body>
   <div class="pixel-sky" aria-hidden="true"></div>
@@ -26,15 +26,21 @@
       <p id="status" class="status" role="status"></p>
     </main>
     <section id="builderView" class="builder" hidden>
-      <div class="heading"><div class="kicker">TEACHER BUILDER</div><h1>Make an assignment</h1><p class="subhead">Edit the content below, preview it, then copy its student link into Classroom. The link contains the assignment; no student answers are sent anywhere.</p></div>
-      <div class="builder-card"><label for="editor">Assignment content (JSON)</label><textarea id="editor" spellcheck="false"></textarea><p class="builder-help">Keep three reading paragraphs, one multiple-choice question with options, and two short-answer questions. For new images, use a direct HTTPS image URL and include credit and source.</p><div class="builder-actions"><button id="previewButton" class="nav-button primary" type="button">PREVIEW ASSIGNMENT</button><button id="copyButton" class="nav-button secondary" type="button">COPY STUDENT LINK</button><button id="saveButton" class="nav-button secondary" type="button">SAVE TO LIBRARY</button><a class="nav-button secondary button-link" href="?library=1">VIEW LIBRARY</a></div><p id="builderStatus" class="status" role="status"></p></div>
+      <div class="heading"><div class="kicker">TEACHER BUILDER</div><h1>Make an assignment</h1><p class="subhead">Build it here, save a local draft anytime, or publish it permanently for a short Classroom-ready link.</p></div>
+      <div class="builder-card"><label for="editor">Assignment content (JSON)</label><textarea id="editor" spellcheck="false"></textarea><p class="builder-help">Keep three reading paragraphs, one multiple-choice question with options, and two short-answer questions. For new images, use a direct HTTPS image URL and include credit and source.</p><div class="builder-actions"><button id="previewButton" class="nav-button primary" type="button">PREVIEW ASSIGNMENT</button><button id="publishButton" class="nav-button primary" type="button">PUBLISH PERMANENTLY</button><button id="saveButton" class="nav-button secondary" type="button">SAVE DRAFT</button><button id="copyButton" class="nav-button secondary" type="button">COPY DRAFT LINK</button><a class="nav-button secondary button-link" href="?library=1">VIEW LIBRARY</a></div><p id="builderStatus" class="status" role="status"></p></div>
     </section>
     <section id="libraryView" class="library" hidden>
       <div class="heading"><div class="kicker">TEACHER LIBRARY</div><h1>Music assignments</h1><p class="subhead">Open an assignment, copy its student link for Google Classroom, or use one as the starting point for a new assignment.</p></div>
-      <div class="library-toolbar"><a class="nav-button primary button-link" href="?builder=1">+ NEW ASSIGNMENT</a></div>
+      <div class="library-toolbar">
+        <a class="nav-button primary button-link" href="?builder=1">+ NEW ASSIGNMENT</a>
+        <button id="exportButton" class="nav-button secondary" type="button">EXPORT DRAFTS</button>
+        <button id="importButton" class="nav-button secondary" type="button">IMPORT DRAFTS</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+      </div>
+      <div class="library-search-wrap"><label for="librarySearch">Find assignment</label><input id="librarySearch" class="library-search" type="search" placeholder="Search by title…" autocomplete="off"></div>
       <p id="libraryStatus" class="status" role="status"></p>
       <div id="libraryList" class="library-grid" aria-live="polite"></div>
-      <p id="libraryEmpty" class="library-empty" hidden>No saved assignments yet. Create one in the builder and choose Save to Library.</p>
+      <p id="libraryEmpty" class="library-empty" hidden>No assignments match your search.</p>
     </section>
     <footer><span>DERBY MUSIC · YOUR WORK STAYS IN THIS BROWSER UNTIL YOU DOWNLOAD IT</span><div class="footer-links"><a id="libraryLink" href="?library=1">ASSIGNMENT LIBRARY</a><a id="teacherLink" href="?builder=1">NEW ASSIGNMENT</a></div></footer>
   </div>
