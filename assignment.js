@@ -106,6 +106,35 @@ window.ASSIGNMENTS = {
       "Choose one musical moment described in the reading. What feeling or idea does the music help communicate?",
       "Imagine one of the movie's musical scenes without any music. How do you think the scene would feel different?"
     ]
+  },
+  "coco-day-of-the-dead": {
+    "title": "Coco: Día de los Muertos, Music & Memory",
+    "eyebrow": "GENERAL MUSIC · FILM & CULTURE",
+    "readingHeading": "How do music and memory keep stories alive?",
+    "image": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Ofrenda%2005.JPG",
+    "imageAlt": "A traditional Día de los Muertos ofrenda with offerings and decorations",
+    "imageCredit": "Sr JessMichelle, 2014 · CC0, via Wikimedia Commons",
+    "imageSource": "https://commons.wikimedia.org/wiki/File:Ofrenda_05.JPG",
+    "reading": [
+      "Día de los Muertos, or Day of the Dead, is a Mexican tradition that honors loved ones who have died. It is observed especially on November 1 and 2. Its history combines Indigenous Mexican ways of remembering ancestors with Catholic observances introduced during Spanish colonization. Although it takes place near Halloween, Día de los Muertos is not simply a Mexican version of Halloween. Families may tell stories, gather together, and celebrate the lives of people they miss.",
+      "Many families prepare an ofrenda, an altar or display with photographs, candles, food, water, and bright marigold flowers called cempasúchil. Colorful cut-paper decorations called papel picado may hang nearby. These objects help families remember specific people and welcome them symbolically. Traditions are not identical in every home or region. Music is often part of public celebrations and family gatherings: musicians might perform mariachi, regional folk songs, or a loved one's favorite tune.",
+      "In the animated movie Coco, Miguel loves music even though his family has complicated feelings about it. The film uses songs to explore family history, remembrance, and belonging. The song “Remember Me” changes meaning depending on who sings it and why; it can feel like a performance or a personal message. As you watch, listen for changes in tempo, dynamics, instruments, and the way a song is performed. How does music help characters remember someone, express love, or understand their family's past?"
+    ],
+    "multipleChoice": {
+      "question": "Which statement best explains Día de los Muertos?",
+      "options": [
+        "A Mexican tradition for honoring and remembering loved ones who have died",
+        "A holiday where every family follows exactly the same customs",
+        "Another name for Halloween with no separate history",
+        "A celebration that began with the movie Coco"
+      ]
+    },
+    "shortAnswers": [
+      "Choose two details from the reading about Día de los Muertos. Explain what they help families remember or celebrate.",
+      "In Coco, how does a musical moment help tell a character's story or express an emotion? Describe a specific scene or song and explain its effect."
+    ],
+    "activityLink": "coco-word-search.html",
+    "activityLabel": "BONUS ACTIVITY · DAY OF THE DEAD WORD SEARCH"
   }
 };
 
