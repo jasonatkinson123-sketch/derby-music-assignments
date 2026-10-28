@@ -7,7 +7,9 @@
   let themeIndex = Math.floor(new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime() / 86400000) % 5;
   let assignment = window.DEFAULT_ASSIGNMENT;
   let step = 0;
-  let responses = { name: '', choice: null, short: ['', ''] };
+  let responses = { name: '', choice: null, short: ['', ''], coloring: [] };
+  const hasColoring = () => !!(window.DerbyColoring && window.DerbyColoring.hasPainting(assignment));
+  const lastStep = () => hasColoring() ? 5 : 4;
 
   function validAssignment(a) {
     return a && typeof a.title === 'string' && a.title.trim() && Array.isArray(a.reading) && a.reading.length === 3 && a.reading.every(x => typeof x === 'string' && x.trim()) && a.multipleChoice && typeof a.multipleChoice.question === 'string' && a.multipleChoice.question.trim() && Array.isArray(a.multipleChoice.options) && a.multipleChoice.options.length >= 2 && a.multipleChoice.options.every(x => typeof x === 'string' && x.trim()) && Array.isArray(a.shortAnswers) && a.shortAnswers.length === 2 && a.shortAnswers.every(x => typeof x === 'string' && x.trim());
@@ -39,19 +41,24 @@
   function loadDraft() {
     try {
       const value = JSON.parse(sessionStorage.getItem('music-draft:' + location.search + location.hash));
-      if (value && typeof value.name === 'string' && Array.isArray(value.short)) responses = value;
+      if (value && typeof value.name === 'string' && Array.isArray(value.short)) {
+        responses = { ...responses, ...value, coloring: Array.isArray(value.coloring) ? value.coloring : [] };
+      }
     } catch {}
   }
   function showAssignment() {
     assignment = parseAssignment();
     if (!validAssignment(assignment)) assignment = window.DEFAULT_ASSIGNMENT;
-    responses = { name: '', choice: null, short: ['', ''] };
+    responses = { name: '', choice: null, short: ['', ''], coloring: [] };
     loadDraft(); step = 0;
     $('assignmentView').hidden = false; $('builderView').hidden = true; $('libraryView').hidden = true;
     $('teacherLink').hidden = false; $('libraryLink').hidden = false;
     document.title = assignment.title + ' · Derby Music';
     $('title').textContent = assignment.title;
     $('eyebrow').textContent = assignment.eyebrow || 'MUSIC CLASS · READING';
+    $('assignmentView').querySelector('.subhead').textContent = hasColoring()
+      ? 'Read, answer three questions, color your sugar skull, and download everything in one PDF for Google Classroom.'
+      : 'Read the story, answer three questions, and save your work for Google Classroom.';
     render();
   }
   function setHeading(stage, label, heading) {
@@ -59,18 +66,21 @@
   }
   function render() {
     const stage = $('stage'); stage.replaceChildren();
-    const labels = ['THE READING', 'QUESTION 01', 'QUESTION 02', 'QUESTION 03', 'FINISH'];
+    const labels = ['THE READING', 'QUESTION 01', 'QUESTION 02', 'QUESTION 03'];
+    if (hasColoring()) labels.push('COLORING');
+    labels.push('FINISH');
     $('stepLabel').textContent = labels[step];
-    $('stepCounter').textContent = (step + 1) + ' / 5';
+    $('stepCounter').textContent = (step + 1) + ' / ' + labels.length;
     $('segments').replaceChildren(...labels.map((_, i) => node('span', null, 'segment' + (i <= step ? ' active' : ''))));
     $('status').textContent = '';
     $('backButton').disabled = step === 0;
-    $('nextButton').textContent = step === 4 ? 'DOWNLOAD PDF ↓' : 'NEXT →';
-    $('navHint').textContent = step === 4 ? 'SAVE YOUR WORK' : 'YOUR ANSWERS ARE SAVED AS YOU GO';
+    $('nextButton').textContent = step === lastStep() ? 'DOWNLOAD PDF ↓' : 'NEXT →';
+    $('navHint').textContent = step === lastStep() ? 'SAVE YOUR WORK' : 'YOUR ANSWERS ARE SAVED AS YOU GO';
     if (step === 0) renderReading(stage);
     if (step === 1) renderChoice(stage);
     if (step === 2 || step === 3) renderShort(stage, step - 2);
-    if (step === 4) renderFinish(stage);
+    if (hasColoring() && step === 4) renderColoring(stage);
+    if (step === lastStep()) renderFinish(stage);
   }
   function renderReading(stage) {
     setHeading(stage, 'THE STORY · 3 SHORT PARAGRAPHS', assignment.readingHeading || 'Can music paint a picture?');
@@ -90,18 +100,6 @@
       figure.append(img, caption); layout.append(figure);
     }
     stage.append(layout);
-    if (assignment.activityLink && /^[a-z0-9][a-z0-9-]*\.html$/i.test(assignment.activityLink)) {
-      const activity = node('a', assignment.activityLabel || 'OPEN BONUS ACTIVITY');
-      activity.href = assignment.activityLink;
-      activity.target = '_blank';
-      activity.rel = 'noopener noreferrer';
-      activity.className = 'nav-button secondary button-link';
-      activity.style.display = 'inline-flex';
-      activity.style.marginTop = '20px';
-      activity.style.textDecoration = 'none';
-      stage.append(activity);
-      stage.append(node('p', 'Optional printable activity — opens in a new tab. Return here for your questions and PDF.', 'hint'));
-    }
   }
   function renderChoice(stage) {
     setHeading(stage, 'PICK ONE ANSWER', assignment.multipleChoice.question);
@@ -123,27 +121,49 @@
     label.htmlFor = field.id;
     stage.append(label, field, node('p', 'A sentence or two is enough. You can go back and edit your answer.', 'hint'));
   }
+  function renderColoring(stage) {
+    setHeading(stage, 'ACTIVITY 04 · PAINT BY NUMBERS', 'Decorate a Día de los Muertos sugar skull');
+    window.DerbyColoring.render(stage, responses.coloring, filled => {
+      responses.coloring = filled;
+      storeDraft();
+    });
+  }
   function renderFinish(stage) {
     setHeading(stage, 'FINAL STEP', 'Ready to turn in your work?');
-    stage.append(node('p', 'Check your answers and enter your name. The PDF will contain your name, the title, and your three answers.', 'question-intro'));
+    stage.append(node('p', hasColoring()
+      ? 'Your PDF will contain your written answers AND a full-color page of your finished sugar skull.'
+      : 'Check your answers and enter your name. The PDF will contain your name, the title, and your three answers.', 'question-intro'));
     const grid = node('div', null, 'finish-grid');
     const one = node('div'); one.append(node('b', 'MULTIPLE CHOICE'), node('p', responses.choice == null ? 'No answer yet' : assignment.multipleChoice.options[responses.choice] || 'No answer yet'));
     const two = node('div'); two.append(node('b', 'SHORT ANSWERS'), node('p', responses.short.filter(x => x && x.trim()).length + ' of 2 entered'));
-    grid.append(one, two); stage.append(grid);
+    grid.append(one, two);
+    if (hasColoring()) {
+      const three = node('div');
+      three.append(node('b', 'SUGAR SKULL COLORING'), node('p', responses.coloring.length + ' of ' + window.DerbyColoring.count + ' sections completed'));
+      grid.append(three);
+    }
+    stage.append(grid);
     const label = node('label', 'Your name', 'answer-label'); label.htmlFor = 'studentName';
     const field = node('input', null, 'name-box'); field.type = 'text'; field.id = 'studentName'; field.autocomplete = 'name'; field.placeholder = 'First and last name'; field.maxLength = 100; field.value = responses.name;
     field.addEventListener('input', () => { responses.name = field.value; storeDraft(); });
     stage.append(label, field, node('p', 'After downloading, attach the PDF to your Google Classroom assignment and select Turn in.', 'hint'));
   }
-  function goNext() {
-    if (step < 4) { step++; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+  async function goNext() {
+    if (step < lastStep()) {
+      if (hasColoring() && step === 4 && !window.DerbyColoring.complete(responses.coloring)) {
+        $('status').textContent = 'Color every numbered section of the skull before continuing.';
+        return;
+      }
+      step++; render(); window.scrollTo({ top: 0, behavior: 'smooth' }); return;
+    }
     const missing = [];
     if (responses.choice == null || !assignment.multipleChoice.options[responses.choice]) missing.push('multiple-choice question');
     responses.short.forEach((answer, i) => { if (!answer || !answer.trim()) missing.push('short answer ' + (i + 1)); });
     if (!responses.name.trim()) missing.push('your name');
+    if (hasColoring() && !window.DerbyColoring.complete(responses.coloring)) missing.push('all sugar skull sections');
     if (missing.length) { $('status').textContent = 'Please complete ' + missing.join(', ') + ' before downloading.'; return; }
     try {
-      const pdf = makePdf();
+      const pdf = await makePdf();
       const url = URL.createObjectURL(pdf);
       const a = node('a'); a.href = url;
       a.download = (responses.name.trim() + ' - ' + assignment.title).replace(/[\\/:*?"<>|]/g, '').slice(0, 130) + '.pdf';
@@ -151,8 +171,8 @@
       $('status').textContent = 'Downloaded! Attach the PDF in Google Classroom and select Turn in.';
     } catch { $('status').textContent = 'The PDF could not be created. Please try again.'; }
   }
-  // Small self-contained PDF writer: text-only, with wrapped answers and automatic pages.
-  function makePdf() {
+  // Self-contained PDF writer for text answers and an embedded color artwork page.
+  async function makePdf() {
     const map = { '‘': "'", '’': "'", '“': '"', '”': '"', '—': '-', '–': '-', '…': '...', '•': '*', '€': 'EUR', '™': '(TM)' };
     const normalized = s => String(s).replace(/[‘’“”—–…•€™]/g, c => map[c] || '').replace(/[^\x20-\x7e\xa0-\xff\n]/g, '?');
     const wrap = (text, width) => {
@@ -186,7 +206,25 @@
       objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${c} 0 R >>`);
       const stream = commands.join('\n') + '\n'; objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}endstream`);
     });
-    objects[2] = `<< /Type /Pages /Kids [${pageRefs.join(' ')}] /Count ${pages.length} >>`;
+    if (hasColoring()) {
+      const art = await window.DerbyColoring.snapshot(responses.coloring);
+      // JPEG bytes are held in a binary string: PDF object lengths and offsets remain byte-accurate.
+      const imageIndex = objects.length;
+      objects.push('<< /Type /XObject /Subtype /Image /Width ' + art.width + ' /Height ' + art.height + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ' + art.binary.length + ' >>\nstream\n' + art.binary + '\nendstream');
+      const pageIndex = objects.length, contentIndex = pageIndex + 1;
+      pageRefs.push(pageIndex + ' 0 R');
+      objects.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> /XObject << /Skull ' + imageIndex + ' 0 R >> >> /Contents ' + contentIndex + ' 0 R >>');
+      const commands = [
+        'BT /F2 19 Tf 55 744 Td (Completed Sugar Skull - Paint by Numbers) Tj ET',
+        'BT /F1 11 Tf 55 719 Td (Student: ' + esc(responses.name.trim()) + ') Tj ET',
+        'BT /F1 10 Tf 55 699 Td (' + window.DerbyColoring.count + ' of ' + window.DerbyColoring.count + ' sections completed) Tj ET',
+        'q 360 0 0 436 126 206 cm /Skull Do Q',
+        'BT /F1 10 Tf 55 114 Td (Día de los Muertos: music, memory, and family.) Tj ET'
+      ];
+      const stream = commands.join('\n') + '\n';
+      objects.push('<< /Length ' + stream.length + ' >>\nstream\n' + stream + 'endstream');
+    }
+    objects[2] = `<< /Type /Pages /Kids [${pageRefs.join(' ')}] /Count ${pageRefs.length} >>`;
     let pdf = '%PDF-1.4\n'; const offsets = [0];
     for (let i = 1; i < objects.length; i++) { offsets[i] = pdf.length; pdf += `${i} 0 obj\n${objects[i]}\nendobj\n`; }
     const start = pdf.length; pdf += `xref\n0 ${objects.length}\n0000000000 65535 f \n`;
