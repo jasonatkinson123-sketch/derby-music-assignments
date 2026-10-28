@@ -9,9 +9,9 @@ main{max-width:850px;margin:28px auto;padding:32px;background:#fff;box-shadow:0 
 label{font-weight:700}input{border:0;border-bottom:2px solid #777;font:inherit;width:230px}
 .grid{display:grid;grid-template-columns:repeat(15,1fr);width:min(100%,570px);margin:24px auto 18px;gap:0;border:2px solid #26203d}
 .cell{aspect-ratio:1;display:grid;place-items:center;border:1px solid #ddd;font:700 clamp(12px,2.35vw,19px)/1 monospace;user-select:none}
-.cell{cursor:pointer;touch-action:pan-y}.cell.selecting{background:#bdd2fa}.cell.found{background:#ffdc7f}.words li.found{text-decoration:line-through;color:#366d39} .words{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 20px;list-style:none;padding:0;margin:12px 0 24px}
+.cell{cursor:pointer;touch-action:pan-y;background:#fff;color:#26203d;letter-spacing:0;font:700 clamp(12px,2.35vw,19px)/1 monospace}.cell.selecting{background:#bdd2fa}.cell.found{background:#ffdc7f}.words li.found{text-decoration:line-through;color:#366d39} .words{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 20px;list-style:none;padding:0;margin:12px 0 24px}
 .words li{font-weight:750;letter-spacing:.4px}.actions{display:flex;gap:10px;flex-wrap:wrap}
-button,a.btn{font:700 14px system-ui;letter-spacing:.5px;background:#29203e;color:white;padding:12px 15px;border:0;cursor:pointer;text-decoration:none}
+button:not(.cell),a.btn{font:700 14px system-ui;letter-spacing:.5px;background:#29203e;color:white;padding:12px 15px;border:0;cursor:pointer;text-decoration:none}
 button.secondary,a.secondary{background:#eee8db;color:#29203e} .note{font-size:13px;color:#51495b}
 footer{border-top:1px solid #ccc;margin-top:24px;padding-top:10px;font-size:12px}
 @media(max-width:520px){main{margin:0;padding:15px}.words{grid-template-columns:repeat(2,1fr)}}
