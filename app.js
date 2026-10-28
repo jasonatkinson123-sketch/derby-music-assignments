@@ -90,6 +90,18 @@
       figure.append(img, caption); layout.append(figure);
     }
     stage.append(layout);
+    if (assignment.activityLink && /^[a-z0-9][a-z0-9-]*\.html$/i.test(assignment.activityLink)) {
+      const activity = node('a', assignment.activityLabel || 'OPEN BONUS ACTIVITY');
+      activity.href = assignment.activityLink;
+      activity.target = '_blank';
+      activity.rel = 'noopener noreferrer';
+      activity.className = 'nav-button secondary button-link';
+      activity.style.display = 'inline-flex';
+      activity.style.marginTop = '20px';
+      activity.style.textDecoration = 'none';
+      stage.append(activity);
+      stage.append(node('p', 'Optional printable activity — opens in a new tab. Return here for your questions and PDF.', 'hint'));
+    }
   }
   function renderChoice(stage) {
     setHeading(stage, 'PICK ONE ANSWER', assignment.multipleChoice.question);
