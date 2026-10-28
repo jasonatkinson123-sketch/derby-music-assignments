@@ -9,7 +9,7 @@ main{max-width:850px;margin:28px auto;padding:32px;background:#fff;box-shadow:0 
 label{font-weight:700}input{border:0;border-bottom:2px solid #777;font:inherit;width:230px}
 .grid{display:grid;grid-template-columns:repeat(15,1fr);width:min(100%,570px);margin:24px auto 18px;gap:0;border:2px solid #26203d}
 .cell{aspect-ratio:1;display:grid;place-items:center;border:1px solid #ddd;font:700 clamp(12px,2.35vw,19px)/1 monospace;user-select:none}
-.cell.found{background:#ffdc7f} .words{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 20px;list-style:none;padding:0;margin:12px 0 24px}
+.cell{cursor:pointer;touch-action:pan-y}.cell.selecting{background:#bdd2fa}.cell.found{background:#ffdc7f}.words li.found{text-decoration:line-through;color:#366d39} .words{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 20px;list-style:none;padding:0;margin:12px 0 24px}
 .words li{font-weight:750;letter-spacing:.4px}.actions{display:flex;gap:10px;flex-wrap:wrap}
 button,a.btn{font:700 14px system-ui;letter-spacing:.5px;background:#29203e;color:white;padding:12px 15px;border:0;cursor:pointer;text-decoration:none}
 button.secondary,a.secondary{background:#eee8db;color:#29203e} .note{font-size:13px;color:#51495b}
@@ -20,33 +20,41 @@ footer{border-top:1px solid #ccc;margin-top:24px;padding-top:10px;font-size:12px
 <body><main>
 <div class="kicker">DERBY MUSIC · COCO COMPANION ACTIVITY</div>
 <h1>Día de los Muertos Word Search</h1>
-<p class="sub">Find the 12 words connected to <em>Coco</em>, Mexican traditions, and music. Words may run across, down, or diagonally, forwards or backwards. Circle them on a printed sheet, or use the answer-key button to check after finishing.</p>
+<p class="sub">Find the 12 words connected to <em>Coco</em>, Mexican traditions, and music. Words may run across, down, or diagonally, forwards or backwards. Tap the first and last letter of each word, or drag across the letters. Progress saves automatically.</p>
 <div class="line"><label>NAME <input aria-label="Student name"></label><label>CLASS <input aria-label="Class"></label></div>
 <div id="grid" class="grid" aria-label="15 by 15 letter grid"></div>
-<h2>Find these words</h2><ul id="words" class="words"></ul>
-<div class="actions"><button onclick="window.print()">PRINT WORD SEARCH</button><button class="secondary" id="answer">SHOW ANSWER KEY</button><a class="btn secondary back" href="./?a=coco-day-of-the-dead">BACK TO MUSIC ASSIGNMENTS</a></div>
+<p id="progress" role="status">0 of 12 found</p><p id="message" aria-live="polite">Tap a first letter, then a last letter.</p><h2>Find these words</h2><ul id="words" class="words"></ul>
+<div class="actions"><button type="button" id="reset">START OVER</button><a class="btn secondary back" href="./?a=coco-day-of-the-dead">BACK TO MUSIC ASSIGNMENTS</a></div>
 <p class="note">This is an optional companion activity. Your main assignment's multiple-choice and short-answer responses are saved separately in its PDF.</p>
 <footer>COCO · DÍA DE LOS MUERTOS · MUSIC, FAMILY & REMEMBRANCE</footer>
 </main><script>
 const words=['OFRENDA','MARIGOLD','MEMORY','MUSIC','COCO','FAMILY','MEXICO','ALTAR','MIGUEL','RHYTHM','SONG','GUITAR'];
-const size=15, grid=Array.from({length:size},()=>Array(size).fill('')), positions=[];
+const size=15,grid=Array.from({length:size},()=>Array(size).fill('')),positions=[];
 const dirs=[[1,0],[0,1],[1,1],[-1,1],[1,-1],[-1,0],[0,-1],[-1,-1]];
-let seed=3102026;function rand(n){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed%n}
-for(const word of words){let done=false;
- for(let attempt=0;attempt<5000&&!done;attempt++){
-  const [dx,dy]=dirs[rand(dirs.length)],x=rand(size),y=rand(size);let ok=true,coords=[];
-  for(let k=0;k<word.length;k++){const xx=x+dx*k,yy=y+dy*k;if(xx<0||yy<0||xx>=size||yy>=size||(grid[yy][xx]&&grid[yy][xx]!==word[k])){ok=false;break}coords.push([xx,yy]);}
-  if(ok){coords.forEach(([xx,yy],k)=>grid[yy][xx]=word[k]);positions.push(coords);done=true;}
- }
- if(!done)throw Error('Could not fit '+word);
-}
+let seed=3102026;
+function rand(n){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed%n}
+for(const word of words){let done=false;for(let attempt=0;attempt<5000&&!done;attempt++){
+ const [dx,dy]=dirs[rand(dirs.length)],x=rand(size),y=rand(size),coords=[];let ok=true;
+ for(let k=0;k<word.length;k++){const xx=x+dx*k,yy=y+dy*k;if(xx<0||yy<0||xx>=size||yy>=size||(grid[yy][xx]&&grid[yy][xx]!==word[k])){ok=false;break}coords.push([xx,yy])}
+ if(ok){coords.forEach(([xx,yy],k)=>grid[yy][xx]=word[k]);positions.push(coords);done=true}
+ }if(!done)throw Error('Cannot place '+word)}
 for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!grid[y][x])grid[y][x]='ABCDEFGHIJKLMNOPQRSTUVWXYZ'[rand(26)];
-const host=document.getElementById('grid');
-grid.forEach((row,y)=>row.forEach((letter,x)=>{const e=document.createElement('span');e.className='cell';e.textContent=letter;e.dataset.pos=x+','+y;host.append(e)}));
-words.forEach(w=>{let li=document.createElement('li');li.textContent=w;document.getElementById('words').append(li)});
-let showing=false;document.getElementById('answer').addEventListener('click',()=>{
- showing=!showing;document.querySelectorAll('.cell').forEach(el=>el.classList.remove('found'));
- if(showing)positions.flat().forEach(([x,y])=>document.querySelector('[data-pos="'+x+','+y+'"]').classList.add('found'));
- document.getElementById('answer').textContent=showing?'HIDE ANSWER KEY':'SHOW ANSWER KEY';
-});
+const host=document.getElementById('grid'),message=document.getElementById('message'),progress=document.getElementById('progress'),cells=[],items=[];
+grid.forEach((row,y)=>row.forEach((letter,x)=>{const e=document.createElement('button');e.type='button';e.className='cell';e.style.padding='0';e.style.borderRadius='0';e.style.minWidth='0';e.textContent=letter;e.dataset.x=x;e.dataset.y=y;e.setAttribute('aria-label','Row '+(y+1)+' column '+(x+1)+' '+letter);host.append(e);cells.push(e)}));
+words.forEach(w=>{const el=document.createElement('li');el.textContent=w;document.getElementById('words').append(el);items.push(el)});
+const key='coco-wordsearch-interactive-v1';let found=new Set();
+try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved))saved.forEach(i=>{if(Number.isInteger(i)&&i>=0&&i<words.length)found.add(i)})}catch(e){}
+let start=null,end=null,dragging=false,moved=false,suppress=false;
+function coord(el){return [+el.dataset.x,+el.dataset.y]}
+function path(a,b){if(!a||!b)return[];const dx=b[0]-a[0],dy=b[1]-a[1],n=Math.max(Math.abs(dx),Math.abs(dy));if(!(dx===0||dy===0||Math.abs(dx)===Math.abs(dy)))return[];return Array.from({length:n+1},(_,i)=>[a[0]+Math.sign(dx)*i,a[1]+Math.sign(dy)*i])}
+function equal(a,b){return a.length===b.length&&a.every((p,i)=>p[0]===b[i][0]&&p[1]===b[i][1])}
+function render(){cells.forEach(e=>e.classList.remove('found','selecting'));found.forEach(i=>positions[i].forEach(([x,y])=>cells[y*size+x].classList.add('found')));path(start,end).forEach(([x,y])=>cells[y*size+x].classList.add('selecting'));items.forEach((e,i)=>e.classList.toggle('found',found.has(i)));progress.textContent=found.size+' of 12 words found'}
+function finish(a,b){const p=path(a,b),i=positions.findIndex((q,k)=>!found.has(k)&&(equal(p,q)||equal(p,[...q].reverse())));if(i<0){message.textContent='Not quite! Try another word.';return}found.add(i);try{localStorage.setItem(key,JSON.stringify([...found]))}catch(e){}message.textContent='Found '+words[i]+'!'+(found.size===12?' You completed the puzzle!':'')}
+host.addEventListener('click',e=>{const el=e.target.closest('.cell');if(!el)return;if(suppress){suppress=false;return}const p=coord(el);if(!start){start=p;end=p;message.textContent='Now tap the last letter.'}else{finish(start,p);start=null;end=null}render()});
+host.addEventListener('pointerdown',e=>{const el=e.target.closest('.cell');if(!el||e.pointerType==='mouse'&&e.button!==0)return;dragging=true;moved=false;start=coord(el);end=start});
+host.addEventListener('pointermove',e=>{if(!dragging)return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.cell');if(!el||!host.contains(el))return;end=coord(el);if(end[0]!==start[0]||end[1]!==start[1])moved=true;if(moved)render()});
+window.addEventListener('pointerup',e=>{if(!dragging)return;dragging=false;if(moved){const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.cell');if(el&&host.contains(el))end=coord(el);finish(start,end);start=null;end=null;render();suppress=true;setTimeout(()=>suppress=false,100)}else{start=null;end=null}});
+host.addEventListener('pointercancel',()=>{dragging=false;start=null;end=null;render()});
+document.getElementById('reset').addEventListener('click',()=>{if(!confirm('Clear your progress?'))return;found.clear();start=null;end=null;try{localStorage.removeItem(key)}catch(e){}message.textContent='Start finding words!';render()});
+render();
 </script></body></html>
