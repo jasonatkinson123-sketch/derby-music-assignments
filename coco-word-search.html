@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coco • Day of the Dead Word Search · Derby Music</title>
+<style>
+:root{font-family:system-ui,Arial,sans-serif;color:#26203d;background:#f7f3e8}*{box-sizing:border-box}
+main{max-width:850px;margin:28px auto;padding:32px;background:#fff;box-shadow:0 8px 30px #2221;border:3px solid #28203f}
+.kicker{font-size:12px;letter-spacing:2px;font-weight:800;color:#8c4d30}h1{margin:.2em 0;font-size:clamp(27px,4vw,40px)}.sub{max-width:700px;line-height:1.5}
+.line{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:18px 0}
+label{font-weight:700}input{border:0;border-bottom:2px solid #777;font:inherit;width:230px}
+.grid{display:grid;grid-template-columns:repeat(15,1fr);width:min(100%,570px);margin:24px auto 18px;gap:0;border:2px solid #26203d}
+.cell{aspect-ratio:1;display:grid;place-items:center;border:1px solid #ddd;font:700 clamp(12px,2.35vw,19px)/1 monospace;user-select:none}
+.cell.found{background:#ffdc7f} .words{display:grid;grid-template-columns:repeat(3,1fr);gap:8px 20px;list-style:none;padding:0;margin:12px 0 24px}
+.words li{font-weight:750;letter-spacing:.4px}.actions{display:flex;gap:10px;flex-wrap:wrap}
+button,a.btn{font:700 14px system-ui;letter-spacing:.5px;background:#29203e;color:white;padding:12px 15px;border:0;cursor:pointer;text-decoration:none}
+button.secondary,a.secondary{background:#eee8db;color:#29203e} .note{font-size:13px;color:#51495b}
+footer{border-top:1px solid #ccc;margin-top:24px;padding-top:10px;font-size:12px}
+@media(max-width:520px){main{margin:0;padding:15px}.words{grid-template-columns:repeat(2,1fr)}}
+@media print{@page{margin:.5in}body{background:#fff}main{border:0;box-shadow:none;margin:0;padding:0;max-width:none}.actions,.note,.back{display:none!important}.grid{width:5.7in}.cell{font-size:16px}h1{font-size:26px}}
+</style></head>
+<body><main>
+<div class="kicker">DERBY MUSIC · COCO COMPANION ACTIVITY</div>
+<h1>Día de los Muertos Word Search</h1>
+<p class="sub">Find the 12 words connected to <em>Coco</em>, Mexican traditions, and music. Words may run across, down, or diagonally, forwards or backwards. Circle them on a printed sheet, or use the answer-key button to check after finishing.</p>
+<div class="line"><label>NAME <input aria-label="Student name"></label><label>CLASS <input aria-label="Class"></label></div>
+<div id="grid" class="grid" aria-label="15 by 15 letter grid"></div>
+<h2>Find these words</h2><ul id="words" class="words"></ul>
+<div class="actions"><button onclick="window.print()">PRINT WORD SEARCH</button><button class="secondary" id="answer">SHOW ANSWER KEY</button><a class="btn secondary back" href="?">BACK TO MUSIC ASSIGNMENTS</a></div>
+<p class="note">This is an optional companion activity. Your main assignment's multiple-choice and short-answer responses are saved separately in its PDF.</p>
+<footer>COCO · DÍA DE LOS MUERTOS · MUSIC, FAMILY & REMEMBRANCE</footer>
+</main><script>
+const words=['OFRENDA','MARIGOLD','MEMORY','MUSIC','COCO','FAMILY','MEXICO','ALTAR','MIGUEL','RHYTHM','SONG','GUITAR'];
+const size=15, grid=Array.from({length:size},()=>Array(size).fill('')), positions=[];
+const dirs=[[1,0],[0,1],[1,1],[-1,1],[1,-1],[-1,0],[0,-1],[-1,-1]];
+let seed=3102026;function rand(n){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed%n}
+for(const word of words){let done=false;
+ for(let attempt=0;attempt<5000&&!done;attempt++){
+  const [dx,dy]=dirs[rand(dirs.length)],x=rand(size),y=rand(size);let ok=true,coords=[];
+  for(let k=0;k<word.length;k++){const xx=x+dx*k,yy=y+dy*k;if(xx<0||yy<0||xx>=size||yy>=size||(grid[yy][xx]&&grid[yy][xx]!==word[k])){ok=false;break}coords.push([xx,yy]);}
+  if(ok){coords.forEach(([xx,yy],k)=>grid[yy][xx]=word[k]);positions.push(coords);done=true;}
+ }
+ if(!done)throw Error('Could not fit '+word);
+}
+for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!grid[y][x])grid[y][x]='ABCDEFGHIJKLMNOPQRSTUVWXYZ'[rand(26)];
+const host=document.getElementById('grid');
+grid.forEach((row,y)=>row.forEach((letter,x)=>{const e=document.createElement('span');e.className='cell';e.textContent=letter;e.dataset.pos=x+','+y;host.append(e)}));
+words.forEach(w=>{let li=document.createElement('li');li.textContent=w;document.getElementById('words').append(li)});
+let showing=false;document.getElementById('answer').addEventListener('click',()=>{
+ showing=!showing;document.querySelectorAll('.cell').forEach(el=>el.classList.remove('found'));
+ if(showing)positions.flat().forEach(([x,y])=>document.querySelector('[data-pos="'+x+','+y+'"]').classList.add('found'));
+ document.getElementById('answer').textContent=showing?'HIDE ANSWER KEY':'SHOW ANSWER KEY';
+});
+</script></body></html>
