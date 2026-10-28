@@ -59,7 +59,7 @@
     const lines = [];
     lines.push('<rect x="0" y="0" width="520" height="630" rx="18" fill="#fffaf0"/>');
     lines.push('<g fill="none" stroke="#d8c7a9" stroke-width="2"><path d="M24 75 Q24 30 69 30 M451 30 Q496 30 496 75 M24 550 Q24 600 69 600 M451 600 Q496 600 496 550"/></g>');
-    lines.push('<path d="M260 74 C180 74 108 126 108 219 C108 258 98 287 116 331 C123 351 138 365 149 380 C152 429 168 454 190 471 L190 519 Q190 551 220 551 L300 551 Q330 551 330 519 L330 471 C352 454 368 429 371 380 C382 365 397 351 404 331 C422 287 412 258 412 219 C412 126 340 74 260 74 Z" fill="#fffdf6" stroke="#30233f" stroke-width="8" stroke-linejoin="round"/>');
+    lines.push('<path d="M260 74 C180 74 108 126 108 219 C108 258 98 287 116 331 C123 351 138 365 149 380 C152 429 168 454 190 471 L190 519 Q190 586 225 586 L295 586 Q330 586 330 519 L330 471 C352 454 368 429 371 380 C382 365 397 351 404 331 C422 287 412 258 412 219 C412 126 340 74 260 74 Z" fill="#fffdf6" stroke="#30233f" stroke-width="8" stroke-linejoin="round"/>');
     // Uncolored regions show their number. Matching with the palette colors them in.
     regions.forEach((r, index) => {
       const isDone = done.has(index);
