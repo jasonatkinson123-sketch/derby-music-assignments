@@ -133,8 +133,7 @@ window.ASSIGNMENTS = {
       "Choose two details from the reading about Día de los Muertos. Explain what they help families remember or celebrate.",
       "In Coco, how does a musical moment help tell a character's story or express an emotion? Describe a specific scene or song and explain its effect."
     ],
-    "activityLink": "coco-word-search.html",
-    "activityLabel": "BONUS ACTIVITY · DAY OF THE DEAD WORD SEARCH"
+    "coloring": { "type": "sugar-skull", "required": true, "title": "Sugar Skull Paint by Numbers" }
   }
 };
 
