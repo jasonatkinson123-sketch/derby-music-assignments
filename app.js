@@ -345,6 +345,15 @@
     const list = $('libraryList');
     const query = (($('librarySearch') && $('librarySearch').value) || '').trim().toLowerCase();
     list.replaceChildren();
+    if (!query || 'what is an instrument? instrument lab monday'.includes(query)) {
+      const card = node('article', null, 'library-card');
+      card.append(node('div', 'INTERACTIVE · INSTRUMENT LAB · MONDAY', 'library-meta'), node('h2', 'What Is an Instrument?'));
+      const actions = node('div', null, 'library-actions');
+      const url = new URL('instrument-lab-monday.html', location.href).href;
+      const open = node('a', 'OPEN ASSIGNMENT'); open.className = 'library-button primary'; open.href = url; open.target = '_blank'; open.rel = 'noopener';
+      const copy = node('button', 'COPY STUDENT LINK'); copy.className = 'library-button'; copy.type = 'button'; copy.onclick = () => copyText(url, $('libraryStatus'));
+      actions.append(open, copy); card.append(actions); list.append(card);
+    }
     Object.entries(window.ASSIGNMENTS || {}).forEach(([key, a]) => {
       if (query && !a.title.toLowerCase().includes(query)) return;
       list.append(libraryCard(a.title, 'PUBLISHED · PERMANENT SHORT LINK', builtInLink(key), '?builder=1&a=' + encodeURIComponent(key), null, a));
